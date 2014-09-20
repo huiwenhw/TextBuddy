@@ -1,5 +1,3 @@
-
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -8,6 +6,7 @@ import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Scanner;
 
 public class TextBuddy {
@@ -28,12 +27,13 @@ public class TextBuddy {
 	};
 
 	private static final String MESSAGE_WELCOME = "Welcome to TextBuddy. %1$s is ready for use";
-	private static final String MESSAGE_ADD = "added to %1$s: \"%2$s\"";
-	private static final String MESSAGE_DISPLAY = "%1$s. \"%2$s\"";
+	private static final String MESSAGE_ADD = "added to %1$s:\"%2$s\"";
+	private static final String MESSAGE_DISPLAY = "%1$s. %2$s";
 	private static final String MESSAGE_EMPTY = "%1$s is empty";
 	private static final String MESSAGE_DELETE = "deleted from %1$s: \"%2$s\"";
 	private static final String MESSAGE_CLEAR = "all content deleted from %1$s";
 	private static final String MESSAGE_ERROR = "Unrecognised command type";
+	private static final String MESSAGE_SEARCH_ERROR = "Unrecognised search type%1$s/There is no line containing%1$s";
 
 	private static Scanner sc = new Scanner(System.in);
 	private static ArrayList<String> arr = new ArrayList<String>();
@@ -81,13 +81,12 @@ public class TextBuddy {
 		if (userCommand.trim().equals("")) {
 			System.out.println(String.format(MESSAGE_ERROR));
 		}
-
 		CommandType commandType = determineCommandType(getFirstWord(userCommand));
 
 		switch (commandType) {
 			case ADD:
 				System.out.println(addContent(fileName,
-						removeFirstWord(userCommand.trim())));
+						removeFirstWord(userCommand.trim()).trim()));
 				writeFile(file);
 				break;
 			case SORT:
@@ -108,7 +107,7 @@ public class TextBuddy {
 			case SEARCH:
 				System.out.print(searchContent(removeFirstWord(userCommand
 						.trim())));
-				break;	
+				break;
 			case EXIT:
 				writeFile(file);
 				System.exit(0);
@@ -162,8 +161,7 @@ public class TextBuddy {
 		br.close();
 	}
 
-	// changed private to public for Junit testing
-	public static String getFirstWord(String userCommand) {
+	private static String getFirstWord(String userCommand) {
 		String commandTypeString = userCommand.trim().split("\\s+")[0];
 		return commandTypeString;
 	}
@@ -173,15 +171,18 @@ public class TextBuddy {
 		return userCommand.substring(i);
 	}
 
-	// changed private to public for testing
-	public static String addContent(String fileName, String content) {
+	private static String addContent(String fileName, String content) {
 		arr.add(content.trim());
 		return String.format(MESSAGE_ADD, fileName, content);
 	}
 
-
-	private static String sortContent(String fileName) {
-		return "false";
+	public static void sortContent(String fileName) {
+		if (arr.isEmpty()) {
+			System.out.println(String.format(MESSAGE_EMPTY, fileName));
+		} else {
+			Collections.sort(arr);
+		}
+		displayContent(fileName);
 	}
 
 	private static void displayContent(String fileName) {
@@ -195,7 +196,6 @@ public class TextBuddy {
 		}
 	}
 
-	// changed private to public for testing
 	private static String delContent(String fileName, String userCommand) {
 		if (arr.isEmpty()) {
 			return String.format(MESSAGE_ERROR);
@@ -206,14 +206,33 @@ public class TextBuddy {
 		}
 	}
 
-	// changed private to public for testing
-	public static String clear(String fileName) {
+	private static String clear(String fileName) {
 		arr.clear();
 		return String.format(MESSAGE_CLEAR, fileName);
 	}
-	
+
 	private static String searchContent(String toCheck) {
-		return "false";
+		String[] temp;
+		String str = "", checkArr = "";
+		for (int i = 0; i < arr.size(); i++) {
+			checkArr = arr.get(i).replaceAll("[^a-z]", " ");
+			temp = checkArr.split(" ");
+
+			for (int k = 0; k < temp.length; k++) {
+				String checkArrWord = temp[k];
+				if (toCheck.trim().equals(checkArrWord)) {
+					str += String.format(MESSAGE_DISPLAY, i + 1, arr.get(i))
+							+ "\n";
+					break;
+				}
+			}
+			temp = null;
+			checkArr = "";
+		}
+		if (str.equals("")) {
+			return String.format(MESSAGE_SEARCH_ERROR + "\n", toCheck);
+		}
+		return str;
 	}
 
 	private static void writeFile(File file) throws IOException {
