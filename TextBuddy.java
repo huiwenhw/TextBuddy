@@ -1,3 +1,5 @@
+
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -8,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class TextBuddy {
+public class TextBuddyEnum {
 
 	/*
 	 * ==============NOTE TO SELF========================================= These
@@ -19,58 +21,43 @@ public class TextBuddy {
 	 * at which java String.format(...) method can insert values.
 	 * ====================================================================
 	 */
-	
+
 	// The possible command types
 	enum CommandType {
-		ADD, DISPLAY, DELETE, CLEAR, EXIT
+		ADD, DISPLAY, DELETE, CLEAR, EXIT, INVALID
 	};
-	
+
 	private static final String MESSAGE_WELCOME = "Welcome to TextBuddy. %1$s is ready for use";
-	private static final String MESSAGE_ADD = "added to %1$s: %2$s\"";
+	private static final String MESSAGE_ADD = "added to %1$s: \"%2$s\"";
 	private static final String MESSAGE_DISPLAY = "%1$s. \"%2$s\"";
+	private static final String MESSAGE_EMPTY = "%1$s is empty";
 	private static final String MESSAGE_DELETE = "deleted from %1$s: \"%2$s\"";
 	private static final String MESSAGE_CLEAR = "all content deleted from %1$s";
 	private static final String MESSAGE_ERROR = "Unrecognised command type";
-	
+
 	private static Scanner sc = new Scanner(System.in);
 	private static ArrayList<String> arr = new ArrayList<String>();
+	private static String fileName = null;
 
 	public static void main(String[] args) throws IOException {
+		File file = Create(args);
+		run(file);
+	}
 
-		String fileName = args[0];
+	// to check if a file is there. If it's not, create new file
+	private static File Create(String[] args) throws FileNotFoundException,
+			IOException {
+		fileName = args[0];
 		File file = new File(fileName);
-		// if file does not exist, create new file
 		if (!file.exists()) {
 			newFile(file);
 		}
 		readFile(fileName);
 		System.out.println(String.format(MESSAGE_WELCOME, fileName));
-
-		executeCommand(fileName);
-		writeFile(file);
+		return file;
 	}
 
-	private static void executeCommand(String fileName) {
-		while (sc.hasNextLine()) {
-			String userCommand = sc.next().toLowerCase();
-			String content = sc.nextLine();
-
-			if (userCommand.equals("add")) {
-				addContent(fileName, content);
-			} else if (userCommand.equals("display")) {
-				displayContent();
-			} else if (userCommand.equals("delete")) {
-				delContent(fileName, content);
-			} else if (userCommand.equals("clear")) {
-				clear(fileName);
-			} else if (userCommand.equals("exit")) {
-				break;
-			} else {
-				System.out.println(MESSAGE_ERROR);
-			}
-		}
-	}
-
+	// to create new file
 	private static void newFile(File file) {
 		try {
 			file.createNewFile();
@@ -79,10 +66,73 @@ public class TextBuddy {
 		}
 	}
 
+	// to run the whole user commands
+	private static void run(File file) throws IOException {
+		while (true) {
+			System.out.println("Command: ");
+			String userCommand = sc.nextLine().toLowerCase();
+			executeCommand(userCommand, file);
+		}
+	}
+
+	// to execute commands by the user
+	private static void executeCommand(String userCommand, File file)
+			throws IOException {
+		if (userCommand.trim().equals("")) {
+			System.out.println(String.format(MESSAGE_ERROR));
+		}
+
+		CommandType commandType = determineCommandType(getFirstWord(userCommand));
+
+		switch (commandType) {
+			case ADD:
+				System.out.println(addContent(fileName,
+						removeFirstWord(userCommand.trim())));
+				writeFile(file);
+				break;			
+			case DISPLAY:
+				displayContent(fileName);
+				break;
+			case DELETE:
+				System.out.println(delContent(fileName, userCommand));
+				break;
+			case CLEAR:
+				System.out.println(clear(fileName));
+				break;
+			case INVALID:
+				System.out.println(String.format(MESSAGE_ERROR));
+				break;
+			case EXIT:
+				writeFile(file);
+				System.exit(0);
+			default:
+				// throw an error if the command is not recognized
+				throw new Error("Unrecognized command type");
+		}
+	}
+
+	private static CommandType determineCommandType(String userCommandFirstWord) {
+		if (userCommandFirstWord == null) {
+			throw new Error("command type string cannot be null!");
+		} else if (userCommandFirstWord.equals("add")) {
+			return CommandType.ADD;
+		}  else if (userCommandFirstWord.equals("display")) {
+			return CommandType.DISPLAY;
+		} else if (userCommandFirstWord.equals("delete")) {
+			return CommandType.DELETE;
+		} else if (userCommandFirstWord.equals("clear")) {
+			return CommandType.CLEAR;
+		} else if (userCommandFirstWord.equals("exit")) {
+			return CommandType.EXIT;
+		} else {
+			return CommandType.INVALID;
+		}
+	}
+
+	// to read in file contents to an ArrayList
 	private static void readFile(String fileName) throws FileNotFoundException,
 			IOException {
 		BufferedReader br = new BufferedReader(new FileReader(fileName));
-
 		String str = null;
 		while ((str = br.readLine()) != null) {
 			arr.add(str);
@@ -90,26 +140,55 @@ public class TextBuddy {
 		br.close();
 	}
 
-	private static void addContent(String fileName, String input) {
-		arr.add(input.trim());
-		System.out.println(String.format(MESSAGE_ADD, fileName, input));
+	// changed private to public for Junit testing
+	public static String getFirstWord(String userCommand) {
+		String commandTypeString = userCommand.trim().split("\\s+")[0];
+		return commandTypeString;
 	}
 
-	private static void displayContent() {
-		for (int i = 0; i < arr.size(); i++) {
-			System.out.println(String.format(MESSAGE_DISPLAY, i+1, arr.get(i)));
+	private static String removeFirstWord(String userCommand) {
+		int i = userCommand.indexOf(' ');
+		return userCommand.substring(i);
+	}
+
+	// changed private to public for testing
+	public static String addContent(String fileName, String content) {
+		arr.add(content.trim());
+		return String.format(MESSAGE_ADD, fileName, content);
+	}
+
+	private static void swap(int i, int k) {
+		String temp = arr.get(k);
+		arr.set(k, arr.get(i));
+		arr.set(i, temp);
+	}
+
+	private static void displayContent(String fileName) {
+		if (arr.isEmpty()) {
+			System.out.println(String.format(MESSAGE_EMPTY, fileName));
+		} else {
+			for (int i = 0; i < arr.size(); i++) {
+				System.out.println(String.format(MESSAGE_DISPLAY, i + 1,
+						arr.get(i)));
+			}
 		}
 	}
 
-	private static void delContent(String fileName, String input) {
-		int toDel = Integer.valueOf(input.trim());
-		System.out.println(String.format(MESSAGE_DELETE, fileName, arr.get(toDel-1)));
-		arr.remove(toDel - 1);
+	// changed private to public for testing
+	private static String delContent(String fileName, String userCommand) {
+		if (arr.isEmpty()) {
+			return String.format(MESSAGE_ERROR);
+		} else {
+			int toDel = Integer.parseInt(userCommand.split(" ")[1]);
+			String toRem = arr.remove(toDel - 1);
+			return String.format(MESSAGE_DELETE, fileName, toRem);
+		}
 	}
 
-	private static void clear(String fileName) {
+	// changed private to public for testing
+	public static String clear(String fileName) {
 		arr.clear();
-		System.out.println(String.format(MESSAGE_CLEAR, fileName));
+		return String.format(MESSAGE_CLEAR, fileName);
 	}
 
 	private static void writeFile(File file) throws IOException {
