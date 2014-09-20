@@ -18,7 +18,7 @@ public class TextBuddyTest {
 		method.setAccessible(true);
 		String result = (String) method.invoke(textBuddy, "hello.txt",
 				"little brown fox");
-		assertEquals("added to hello.txt: \"little brown fox\"", result);
+		assertEquals("added to hello.txt: \"little brown fox\"", result);	
 	}
 
 
@@ -36,7 +36,7 @@ public class TextBuddyTest {
 	}
 
 	@Test
-	public void testSearchContent() {
+	public void testSortContent() {
 		String result = "false"; 
 		assertEquals("false", result);
 	}

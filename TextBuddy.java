@@ -162,6 +162,7 @@ public class TextBuddy {
 		return String.format(MESSAGE_ADD, fileName, content);
 	}
 
+
 	private static void sortContent(String fileName) {
 		System.out.println("false");
 	}
