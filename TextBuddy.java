@@ -24,7 +24,7 @@ public class TextBuddy {
 
 	// The possible command types
 	enum CommandType {
-		ADD, DISPLAY, DELETE, CLEAR, EXIT, INVALID
+		ADD, DISPLAY, DELETE, CLEAR, EXIT, INVALID, SORT
 	};
 
 	private static final String MESSAGE_WELCOME = "Welcome to TextBuddy. %1$s is ready for use";
@@ -89,7 +89,10 @@ public class TextBuddy {
 				System.out.println(addContent(fileName,
 						removeFirstWord(userCommand.trim())));
 				writeFile(file);
-				break;			
+				break;
+			case SORT:
+				sortContent(fileName);
+				break;
 			case DISPLAY:
 				displayContent(fileName);
 				break;
@@ -116,7 +119,9 @@ public class TextBuddy {
 			throw new Error("command type string cannot be null!");
 		} else if (userCommandFirstWord.equals("add")) {
 			return CommandType.ADD;
-		}  else if (userCommandFirstWord.equals("display")) {
+		} else if (userCommandFirstWord.equals("sort")) {
+			return CommandType.SORT;
+		} else if (userCommandFirstWord.equals("display")) {
 			return CommandType.DISPLAY;
 		} else if (userCommandFirstWord.equals("delete")) {
 			return CommandType.DELETE;
@@ -155,6 +160,10 @@ public class TextBuddy {
 	public static String addContent(String fileName, String content) {
 		arr.add(content.trim());
 		return String.format(MESSAGE_ADD, fileName, content);
+	}
+
+	private static void sortContent(String fileName) {
+		System.out.println("false");
 	}
 
 	private static void displayContent(String fileName) {

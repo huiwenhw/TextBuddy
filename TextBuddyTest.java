@@ -18,8 +18,9 @@ public class TextBuddyTest {
 		method.setAccessible(true);
 		String result = (String) method.invoke(textBuddy, "hello.txt",
 				"little brown fox");
-		assertEquals("added to hello.txt:\"little brown fox\"", result);
+		assertEquals("added to hello.txt: \"little brown fox\"", result);
 	}
+
 
 	@Test
 	public void testGetFirstWord() throws NoSuchMethodException,
@@ -32,6 +33,12 @@ public class TextBuddyTest {
 				"add little brown fox");
 
 		assertEquals("add", result);
+	}
+
+	@Test
+	public void testSearchContent() {
+		String result = "false"; 
+		assertEquals("false", result);
 	}
 
 	@Test
