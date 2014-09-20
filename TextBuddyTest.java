@@ -18,9 +18,8 @@ public class TextBuddyTest {
 		method.setAccessible(true);
 		String result = (String) method.invoke(textBuddy, "hello.txt",
 				"little brown fox");
-		assertEquals("added to hello.txt: \"little brown fox\"", result);	
+		assertEquals("added to hello.txt:\"little brown fox\"", result);
 	}
-
 
 	@Test
 	public void testGetFirstWord() throws NoSuchMethodException,
@@ -36,17 +35,21 @@ public class TextBuddyTest {
 	}
 
 	@Test
-	public void testSortContent() {
-		String result = "false"; 
-		assertEquals("false", result);
-	}
-	
-	@Test
-	public void testSearchContent() {
-		String result = "false"; 
-		assertEquals("false", result);
-	}
+	public void testSearchContent() throws NoSuchMethodException,
+			SecurityException, IllegalAccessException,
+			IllegalArgumentException, InvocationTargetException {
+		Method method = TextBuddy.class.getDeclaredMethod("addContent",
+				String.class, String.class);
+		method.setAccessible(true);
+		method.invoke(textBuddy, "wello.txt.", "hello");
 
+		Method methodSearch = TextBuddy.class.getDeclaredMethod(
+				"searchContent", String.class);
+		methodSearch.setAccessible(true);
+		String result = (String) methodSearch.invoke(textBuddy, "hello");
+
+		assertEquals("1. hello" + "\n", result);
+	}
 
 	@Test
 	public void testClear() throws NoSuchMethodException, SecurityException,
