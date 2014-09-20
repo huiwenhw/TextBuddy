@@ -10,7 +10,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Scanner;
 
-public class TextBuddyEnum {
+public class TextBuddy {
 
 	/*
 	 * ==============NOTE TO SELF========================================= These
@@ -155,12 +155,6 @@ public class TextBuddyEnum {
 	public static String addContent(String fileName, String content) {
 		arr.add(content.trim());
 		return String.format(MESSAGE_ADD, fileName, content);
-	}
-
-	private static void swap(int i, int k) {
-		String temp = arr.get(k);
-		arr.set(k, arr.get(i));
-		arr.set(i, temp);
 	}
 
 	private static void displayContent(String fileName) {
