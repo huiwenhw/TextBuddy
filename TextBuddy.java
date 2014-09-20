@@ -24,7 +24,7 @@ public class TextBuddy {
 
 	// The possible command types
 	enum CommandType {
-		ADD, DISPLAY, DELETE, CLEAR, EXIT, INVALID, SORT
+		ADD, DISPLAY, DELETE, CLEAR, EXIT, INVALID, SORT, SEARCH
 	};
 
 	private static final String MESSAGE_WELCOME = "Welcome to TextBuddy. %1$s is ready for use";
@@ -105,6 +105,10 @@ public class TextBuddy {
 			case INVALID:
 				System.out.println(String.format(MESSAGE_ERROR));
 				break;
+			case SEARCH:
+				System.out.print(searchContent(removeFirstWord(userCommand
+						.trim())));
+				break;	
 			case EXIT:
 				writeFile(file);
 				System.exit(0);
@@ -115,23 +119,36 @@ public class TextBuddy {
 	}
 
 	private static CommandType determineCommandType(String userCommandFirstWord) {
-		if (userCommandFirstWord == null) {
-			throw new Error("command type string cannot be null!");
-		} else if (userCommandFirstWord.equals("add")) {
-			return CommandType.ADD;
-		} else if (userCommandFirstWord.equals("sort")) {
-			return CommandType.SORT;
-		} else if (userCommandFirstWord.equals("display")) {
-			return CommandType.DISPLAY;
-		} else if (userCommandFirstWord.equals("delete")) {
-			return CommandType.DELETE;
-		} else if (userCommandFirstWord.equals("clear")) {
-			return CommandType.CLEAR;
-		} else if (userCommandFirstWord.equals("exit")) {
-			return CommandType.EXIT;
-		} else {
-			return CommandType.INVALID;
+		CommandType detCommandType;
+
+		switch (userCommandFirstWord) {
+			case "null":
+				throw new Error("command type string cannot be null!");
+			case "add":
+				detCommandType = CommandType.ADD;
+				break;
+			case "sort":
+				detCommandType = CommandType.SORT;
+				break;
+			case "display":
+				detCommandType = CommandType.DISPLAY;
+				break;
+			case "delete":
+				detCommandType = CommandType.DELETE;
+				break;
+			case "clear":
+				detCommandType = CommandType.CLEAR;
+				break;
+			case "search":
+				detCommandType = CommandType.SEARCH;
+				break;
+			case "exit":
+				detCommandType = CommandType.EXIT;
+				break;
+			default:
+				detCommandType = CommandType.INVALID;
 		}
+		return detCommandType;
 	}
 
 	// to read in file contents to an ArrayList
@@ -163,8 +180,8 @@ public class TextBuddy {
 	}
 
 
-	private static void sortContent(String fileName) {
-		System.out.println("false");
+	private static String sortContent(String fileName) {
+		return "false";
 	}
 
 	private static void displayContent(String fileName) {
@@ -193,6 +210,10 @@ public class TextBuddy {
 	public static String clear(String fileName) {
 		arr.clear();
 		return String.format(MESSAGE_CLEAR, fileName);
+	}
+	
+	private static String searchContent(String toCheck) {
+		return "false";
 	}
 
 	private static void writeFile(File file) throws IOException {

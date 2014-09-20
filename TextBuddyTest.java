@@ -40,6 +40,13 @@ public class TextBuddyTest {
 		String result = "false"; 
 		assertEquals("false", result);
 	}
+	
+	@Test
+	public void testSearchContent() {
+		String result = "false"; 
+		assertEquals("false", result);
+	}
+
 
 	@Test
 	public void testClear() throws NoSuchMethodException, SecurityException,
